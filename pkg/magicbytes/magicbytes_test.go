@@ -21,7 +21,7 @@ var META_ARRAY = []*magicbytes.Meta{
 	{Type: "png", Bytes: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}, Offset: 0},
 }
 
-func TestReadDirValidPathSuccess(t *testing.T) {
+func TestWalkDirValidPathSuccess(t *testing.T) {
 
 	t.Run("Should get filepaths successfully", func(t *testing.T) {
 
@@ -36,28 +36,28 @@ func TestReadDirValidPathSuccess(t *testing.T) {
 			}
 		}()
 
-		err := magicbytes.ReadDir(context.Background(), CURRENT_PATH, testFilePathChan)
+		err := magicbytes.WalkDir(context.Background(), CURRENT_PATH, testFilePathChan)
 		if err != nil {
-			t.Error("readDir error: ", err)
+			t.Error("WalkDir error: ", err)
 		}
 	})
 }
 
-func TestReadDirInvalidPathSuccess(t *testing.T) {
+func TestWalkDirInvalidPathSuccess(t *testing.T) {
 
 	t.Run("Should return no error with invalid path", func(t *testing.T) {
 
 		testFilePathChan := make(chan string)
 		defer close(testFilePathChan)
 
-		err := magicbytes.ReadDir(context.Background(), CURRENT_INVALID_PATH, testFilePathChan)
+		err := magicbytes.WalkDir(context.Background(), CURRENT_INVALID_PATH, testFilePathChan)
 		if err != nil {
-			t.Error("readDir error: ", err)
+			t.Error("WalkDir error: ", err)
 		}
 	})
 }
 
-func TestReadDirContextCancelSuccess(t *testing.T) {
+func TestWalkDirContextCancelSuccess(t *testing.T) {
 
 	t.Run("Should cancel search successfully", func(t *testing.T) {
 
@@ -66,9 +66,9 @@ func TestReadDirContextCancelSuccess(t *testing.T) {
 
 		ctx, _ := context.WithCancel(context.Background())
 
-		err := magicbytes.ReadDir(ctx, CURRENT_INVALID_PATH, testFilePathChan)
+		err := magicbytes.WalkDir(ctx, CURRENT_INVALID_PATH, testFilePathChan)
 		if err != nil {
-			t.Error("readDir error: ", err)
+			t.Error("WalkDir error: ", err)
 		}
 	})
 }

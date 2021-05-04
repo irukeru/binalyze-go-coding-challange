@@ -56,9 +56,9 @@ func Search(ctx context.Context, targetDir string, metas []*Meta, onMatch OnMatc
 
 	// need to fix file path for running os
 	p := filepath.FromSlash(targetDir)
-	err := readDir(ctx, p, PathChannel)
+	err := walkDir(ctx, p, PathChannel)
 	if err != nil {
-		log.Println("readDir error: ", err)
+		log.Println("walkDir error: ", err)
 		return err
 	}
 
@@ -84,8 +84,8 @@ func findMatchWorker(pathChannel <-chan string, onMatch OnMatchFunc, metas []*Me
 	}
 }
 
-// readDir gets the file list and sends it via channel by using filePath.WalkDir method
-func readDir(ctx context.Context, root string, pathChannel chan<- string) error {
+// walkDir gets the file list and sends it via channel by using filePath.WalkDir method
+func walkDir(ctx context.Context, root string, pathChannel chan<- string) error {
 
 	select {
 	case <-ctx.Done():

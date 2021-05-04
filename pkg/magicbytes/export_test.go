@@ -1,6 +1,6 @@
 package magicbytes
 
 var CheckMetaData = checkMetaData
-var ReadDir = readDir
+var WalkDir = walkDir
 var FindMatch = findMatch
 var FindMatchWorker = findMatchWorker
