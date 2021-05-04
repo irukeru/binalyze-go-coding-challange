@@ -77,51 +77,64 @@ func TestWalkDirContextCancelSuccess(t *testing.T) {
 
 func TestCheckMetaDataSuccess(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(XlsPath, XlsFileMeta)
+	t.Run("Should check meta data successfully", func(t *testing.T) {
+		result := magicbytes.CheckMetaData(XlsPath, XlsFileMeta)
 
-	if !result {
-		t.Errorf(" file should have found")
-	}
+		if !result {
+			t.Errorf("file should have found")
+		}
+	})
 }
 
 func TestCheckMetaDataWithOffetSuccess(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(XlsPath, XlsFileMetaWithOffset)
+	t.Run("Should check meta data with having offset for magic bytes successfully", func(t *testing.T) {
+		result := magicbytes.CheckMetaData(XlsPath, XlsFileMetaWithOffset)
 
-	if !result {
-		t.Errorf(" file should have found")
-	}
+		if !result {
+			t.Errorf("file should have found")
+		}
+	})
 }
 
 func TestCheckMetaDataFailureUnableToOpenFile(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(InvalidXlsPath, XlsFileMeta)
+	t.Run("Should check meta data function found no result since having unable to open file error", func(t *testing.T) {
 
-	if result {
-		t.Errorf("file should not have found")
-	}
+		result := magicbytes.CheckMetaData(InvalidXlsPath, XlsFileMeta)
+
+		if result {
+			t.Errorf("file should not have found")
+		}
+	})
 }
 
 func TestCheckMetaDataFailureFileSize(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(EmptyFilePath, XlsFileMeta)
+	t.Run("Should check meta data function found no result since having file size error", func(t *testing.T) {
 
-	if result {
-		t.Errorf("file should be empty")
-	}
+		result := magicbytes.CheckMetaData(EmptyFilePath, XlsFileMeta)
+
+		if result {
+			t.Errorf("file should be empty")
+		}
+	})
 }
 
 func TestFindMatchSuccessMatch(t *testing.T) {
 
-	result, status := magicbytes.FindMatch(XlsPath, MetaArray)
+	t.Run("Should find match successfully", func(t *testing.T) {
 
-	if result != "xls" {
-		t.Error("file type should be xls")
-	}
+		result, status := magicbytes.FindMatch(XlsPath, MetaArray)
 
-	if !status {
-		t.Error("there should be a file match")
-	}
+		if result != "xls" {
+			t.Error("file type should be xls")
+		}
+
+		if !status {
+			t.Error("there should be a file match")
+		}
+	})
 }
 
 func TestFindMatchSuccessNoMatch(t *testing.T) {
