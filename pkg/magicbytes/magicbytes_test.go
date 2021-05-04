@@ -15,6 +15,8 @@ const CURRENT_INVALID_PATH = "./noDir"
 const EMPTY_FILE_PATY = "../../test/empty_file.txt"
 
 var XLS_FILE_META = magicbytes.Meta{"xls", []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, 0}
+var XLS_FILE_META_WITH_OFFSET = magicbytes.Meta{"xls", []byte{0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, 1}
+
 var META_ARRAY = []*magicbytes.Meta{
 	{Type: "xls", Bytes: []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, Offset: 0},
 	{Type: "jpg", Bytes: []byte{0xFF, 0xD8}, Offset: 0},
@@ -76,6 +78,15 @@ func TestWalkDirContextCancelSuccess(t *testing.T) {
 func TestCheckMetaDataSuccess(t *testing.T) {
 
 	result := magicbytes.CheckMetaData(XLS_PATH, XLS_FILE_META)
+
+	if !result {
+		t.Errorf(" file should have found")
+	}
+}
+
+func TestCheckMetaDataWithOffetSuccess(t *testing.T) {
+
+	result := magicbytes.CheckMetaData(XLS_PATH, XLS_FILE_META_WITH_OFFSET)
 
 	if !result {
 		t.Errorf(" file should have found")
