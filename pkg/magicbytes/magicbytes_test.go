@@ -8,16 +8,16 @@ import (
 	"github.com/irukeru/binalyze-go-coding-challange/pkg/magicbytes"
 )
 
-const XLS_PATH = "../../test/file_example_XLS_10.xls"
-const INVALID_XLS_PATH = "./file_example_XLS_10.xls"
-const CURRENT_PATH = "./"
-const CURRENT_INVALID_PATH = "./noDir"
-const EMPTY_FILE_PATY = "../../test/empty_file.txt"
+const XlsPath = "../../test/file_example_XLS_10.xls"
+const InvalidXlsPath = "./file_example_XLS_10.xls"
+const CurrentPath = "./"
+const CurrentInvalidPath = "./noDir"
+const EmptyFilePath = "../../test/empty_file.txt"
 
-var XLS_FILE_META = magicbytes.Meta{"xls", []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, 0}
-var XLS_FILE_META_WITH_OFFSET = magicbytes.Meta{"xls", []byte{0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, 1}
+var XlsFileMeta = magicbytes.Meta{"xls", []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, 0}
+var XlsFileMetaWithOffset = magicbytes.Meta{"xls", []byte{0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, 1}
 
-var META_ARRAY = []*magicbytes.Meta{
+var MetaArray = []*magicbytes.Meta{
 	{Type: "xls", Bytes: []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}, Offset: 0},
 	{Type: "jpg", Bytes: []byte{0xFF, 0xD8}, Offset: 0},
 	{Type: "png", Bytes: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}, Offset: 0},
@@ -38,7 +38,7 @@ func TestWalkDirValidPathSuccess(t *testing.T) {
 			}
 		}()
 
-		err := magicbytes.WalkDir(context.Background(), CURRENT_PATH, testFilePathChan)
+		err := magicbytes.WalkDir(context.Background(), CurrentPath, testFilePathChan)
 		if err != nil {
 			t.Error("WalkDir error: ", err)
 		}
@@ -52,7 +52,7 @@ func TestWalkDirInvalidPathSuccess(t *testing.T) {
 		testFilePathChan := make(chan string)
 		defer close(testFilePathChan)
 
-		err := magicbytes.WalkDir(context.Background(), CURRENT_INVALID_PATH, testFilePathChan)
+		err := magicbytes.WalkDir(context.Background(), CurrentInvalidPath, testFilePathChan)
 		if err != nil {
 			t.Error("WalkDir error: ", err)
 		}
@@ -68,7 +68,7 @@ func TestWalkDirContextCancelSuccess(t *testing.T) {
 
 		ctx, _ := context.WithCancel(context.Background())
 
-		err := magicbytes.WalkDir(ctx, CURRENT_INVALID_PATH, testFilePathChan)
+		err := magicbytes.WalkDir(ctx, CurrentInvalidPath, testFilePathChan)
 		if err != nil {
 			t.Error("WalkDir error: ", err)
 		}
@@ -77,7 +77,7 @@ func TestWalkDirContextCancelSuccess(t *testing.T) {
 
 func TestCheckMetaDataSuccess(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(XLS_PATH, XLS_FILE_META)
+	result := magicbytes.CheckMetaData(XlsPath, XlsFileMeta)
 
 	if !result {
 		t.Errorf(" file should have found")
@@ -86,7 +86,7 @@ func TestCheckMetaDataSuccess(t *testing.T) {
 
 func TestCheckMetaDataWithOffetSuccess(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(XLS_PATH, XLS_FILE_META_WITH_OFFSET)
+	result := magicbytes.CheckMetaData(XlsPath, XlsFileMetaWithOffset)
 
 	if !result {
 		t.Errorf(" file should have found")
@@ -95,7 +95,7 @@ func TestCheckMetaDataWithOffetSuccess(t *testing.T) {
 
 func TestCheckMetaDataFailureUnableToOpenFile(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(INVALID_XLS_PATH, XLS_FILE_META)
+	result := magicbytes.CheckMetaData(InvalidXlsPath, XlsFileMeta)
 
 	if result {
 		t.Errorf("file should not have found")
@@ -104,7 +104,7 @@ func TestCheckMetaDataFailureUnableToOpenFile(t *testing.T) {
 
 func TestCheckMetaDataFailureFileSize(t *testing.T) {
 
-	result := magicbytes.CheckMetaData(EMPTY_FILE_PATY, XLS_FILE_META)
+	result := magicbytes.CheckMetaData(EmptyFilePath, XlsFileMeta)
 
 	if result {
 		t.Errorf("file should be empty")
@@ -113,7 +113,7 @@ func TestCheckMetaDataFailureFileSize(t *testing.T) {
 
 func TestFindMatchSuccessMatch(t *testing.T) {
 
-	result, status := magicbytes.FindMatch(XLS_PATH, META_ARRAY)
+	result, status := magicbytes.FindMatch(XlsPath, MetaArray)
 
 	if result != "xls" {
 		t.Error("file type should be xls")
@@ -128,7 +128,7 @@ func TestFindMatchSuccessNoMatch(t *testing.T) {
 
 	t.Run("Find no match successfully", func(t *testing.T) {
 
-		result, status := magicbytes.FindMatch(CURRENT_PATH, META_ARRAY)
+		result, status := magicbytes.FindMatch(CurrentPath, MetaArray)
 
 		if result != "" {
 			t.Error("file type should be empty string")
@@ -153,12 +153,12 @@ func TestFindMatchWorkerOnMatchReturnFalseSuccess(t *testing.T) {
 		go func() {
 			magicbytes.FindMatchWorker(testFilePathChan, func(path, metaType string) bool {
 				return false
-			}, META_ARRAY)
+			}, MetaArray)
 
 			done <- true
 		}()
 
-		testFilePathChan <- XLS_PATH
+		testFilePathChan <- XlsPath
 
 		<-done
 	})
@@ -176,12 +176,12 @@ func TestFindMatchWorkerOnMatchReturnTrueSuccess(t *testing.T) {
 			magicbytes.FindMatchWorker(testFilePathChan, func(path, metaType string) bool {
 				close(testFilePathChan)
 				return true
-			}, META_ARRAY)
+			}, MetaArray)
 
 			done <- true
 		}()
 
-		testFilePathChan <- XLS_PATH
+		testFilePathChan <- XlsPath
 
 		<-done
 	})
@@ -197,7 +197,7 @@ func TestSearchSuccessfully(t *testing.T) {
 			{Type: "png", Bytes: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}, Offset: 0},
 		}
 
-		magicbytes.Search(context.Background(), XLS_PATH, fileTypes, func(path, metaType string) bool {
+		magicbytes.Search(context.Background(), XlsPath, fileTypes, func(path, metaType string) bool {
 			return true
 		})
 	})
@@ -217,7 +217,7 @@ func TestSearchCancelContextSuccessfully(t *testing.T) {
 		go func() {
 			cancel()
 
-			err := magicbytes.Search(ctx, XLS_PATH, fileTypes, func(path, metaType string) bool {
+			err := magicbytes.Search(ctx, XlsPath, fileTypes, func(path, metaType string) bool {
 				return true
 			})
 
@@ -242,7 +242,7 @@ func TestSearchDeadlineExceededSuccessfully(t *testing.T) {
 			{Type: "png", Bytes: []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}, Offset: 0},
 		}
 
-		err := magicbytes.Search(ctx, XLS_PATH, fileTypes, func(path, metaType string) bool {
+		err := magicbytes.Search(ctx, XlsPath, fileTypes, func(path, metaType string) bool {
 			return true
 		})
 
@@ -258,7 +258,7 @@ func TestSearchMetaArraySizeExceededErrorSuccessfully(t *testing.T) {
 
 		fileTypes := make([]*magicbytes.Meta, magicbytes.MaxMetaArrayLength+1)
 
-		err := magicbytes.Search(context.Background(), XLS_PATH, fileTypes, func(path, metaType string) bool {
+		err := magicbytes.Search(context.Background(), XlsPath, fileTypes, func(path, metaType string) bool {
 			return true
 		})
 
@@ -274,7 +274,7 @@ func TestSearchWithEmptyMetaArraySuccessfully(t *testing.T) {
 
 		fileTypes := make([]*magicbytes.Meta, 0)
 
-		err := magicbytes.Search(context.Background(), XLS_PATH, fileTypes, func(path, metaType string) bool {
+		err := magicbytes.Search(context.Background(), XlsPath, fileTypes, func(path, metaType string) bool {
 			return true
 		})
 
